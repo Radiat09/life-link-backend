@@ -1,4 +1,3 @@
-
 import bcrypt from "bcryptjs";
 import httpStatus from "http-status";
 import { JwtPayload } from "jsonwebtoken";
@@ -8,12 +7,13 @@ import { createNewAccessTokenWithRefreshToken, createUserTokens } from "../../ut
 import emailSender from "./emailSender";
 import { AppError } from "../../utils/AppError";
 import { prisma } from "../../config/prisma";
+import { status } from "@prisma/client";
 
 const login = async (payload: { email: string; password: string }) => {
   const user = await prisma.user.findUniqueOrThrow({
     where: {
       email: payload.email,
-      // status: UserStatus.ACTIVE,
+      status: status.ACTIVE,
     },
   });
 
@@ -27,7 +27,7 @@ const login = async (payload: { email: string; password: string }) => {
   const userTokens = createUserTokens(user);
   return {
     ...userTokens,
-    // needPasswordChange: user.needPasswordChange,
+    needPasswordChange: user.needPassChange,
   };
 };
 
@@ -339,13 +339,13 @@ const getMe = async (decodedData: JwtPayload) => {
     }
   })
 
-  const { id, email, role,  } = userData;
+  const { id, email, role, } = userData;
 
   return {
     id,
     email,
     role,
-  
+
   }
 
 }

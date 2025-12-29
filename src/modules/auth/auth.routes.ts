@@ -10,8 +10,6 @@ router.get(
   "/me",
   checkAuth(
     UserRole.ADMIN,
-    UserRole.DOCTOR,
-    UserRole.PATIENT
   ),
   authController.getMe
 )
@@ -30,8 +28,6 @@ router.post(
   '/change-password',
   checkAuth(
     UserRole.ADMIN,
-    UserRole.DOCTOR,
-    UserRole.PATIENT
   ),
   authController.changePassword
 );
