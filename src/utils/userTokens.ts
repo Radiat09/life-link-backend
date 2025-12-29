@@ -1,9 +1,8 @@
-import { User, UserStatus } from '@prisma/client';
+import { User, status } from '@prisma/client';
 import httpStatus from 'http-status-codes';
 import { JwtPayload } from 'jsonwebtoken';
 import { envVars } from '../config/env';
 import { prisma } from '../config/prisma';
-
 import { generateToken, verifyToken } from './jwt';
 import { AppError } from './AppError';
 
@@ -33,8 +32,8 @@ export const createNewAccessTokenWithRefreshToken = async (refreshToken: string)
   const isUserExist = await prisma.user.findUnique({
     where: {
       id: verifiedRefreshToken.userId,
-      // email: verifiedRefreshToken.email,
-      status: UserStatus.ACTIVE,
+      email: verifiedRefreshToken.email,
+      status: status.ACTIVE,
     },
   });
 
@@ -42,10 +41,10 @@ export const createNewAccessTokenWithRefreshToken = async (refreshToken: string)
     throw new AppError(httpStatus.BAD_REQUEST, 'User does not exist');
   }
 
-  if (isUserExist.status === UserStatus.INACTIVE) {
+  if (isUserExist.status === status.INACTIVE) {
     throw new AppError(httpStatus.BAD_REQUEST, `User is ${isUserExist.status}`);
   }
-  if (isUserExist.status === UserStatus.DELETED) {
+  if (isUserExist.status === status.SUSPENDED) {
     throw new AppError(httpStatus.BAD_REQUEST, 'User does not exits anymore');
   }
 
@@ -61,6 +60,6 @@ export const createNewAccessTokenWithRefreshToken = async (refreshToken: string)
 
   return {
     accessToken,
-    needPasswordChange: isUserExist.needPasswordChange
+    needPasswordChange: isUserExist.needPassChange
   };
 };
