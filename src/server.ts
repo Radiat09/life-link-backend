@@ -3,6 +3,7 @@ import { envVars } from './config/env';
 import { Server } from 'http';
 // import { seedSuperAdmin } from './utils/seedAdmin';
 import { connectDB } from './config/prisma';
+import { seedSuperAdmin } from './utils/seedAdmin';
 
 let server: Server;
 
@@ -29,7 +30,7 @@ const startServer = async () => {
 (async () => {
   // await connectRedis()
   await startServer()
-  // await seedSuperAdmin()
+  await seedSuperAdmin()
 })()
 
 process.on("SIGTERM", () => {
