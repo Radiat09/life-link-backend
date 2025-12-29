@@ -4,6 +4,7 @@ import { userValidation } from './user.validation';
 import { UserRole } from '@prisma/client';
 import { checkAuth } from '../../middlewares/checkAuth';
 import { validateRequest } from '../../middlewares/validateRequest';
+import { multerWithErrorHandling } from '../../config/multer.config';
 
 
 
@@ -37,12 +38,11 @@ router.patch(
 
 router.patch(
     "/update-my-profile",
-    // checkAuth(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
-    // fileUploader.upload.single('file'),
-    (req: Request, res: Response, next: NextFunction) => {
-        req.body = JSON.parse(req.body.data)
-        return UserController.updateMyProfie(req, res, next)
-    }
+    multerWithErrorHandling.single('file'),
+    checkAuth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.DONOR, UserRole.HOSPITAL, UserRole.RECIPIENT),
+    validateRequest(userValidation.updateProfileZodSchema),
+    UserController.updateMyProfile
+
 );
 
 export const userRoutes = router;

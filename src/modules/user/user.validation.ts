@@ -1,4 +1,5 @@
 import z from 'zod';
+import { Gender } from '@prisma/client'; // Import your Prisma Enums
 
 // Validation schemas
 export const createUserZodSchema = z.object({
@@ -34,6 +35,31 @@ export const createUserZodSchema = z.object({
 
 
 
+
+export const updateProfileZodSchema = z.object({
+    firstName: z.string().min(2, "First name is too short").optional(),
+    lastName: z.string().min(2, "Last name is too short").optional(),
+    phone: z.string().regex(/^[0-9]{10,15}$/, "Invalid phone number").optional(),
+    bio: z.string().max(500, "Bio cannot exceed 500 characters").optional(),
+    gender: z.nativeEnum(Gender).optional(),
+
+    // Use coerce to convert strings from form-data into numbers/booleans
+    weight: z.coerce.number().positive("Weight must be a positive number").optional(),
+    isAvailable: z.coerce.boolean().optional(),
+
+    city: z.string().min(2).optional(),
+    division: z.string().min(2).optional(),
+    address: z.string().optional(),
+
+    // avatar is usually handled by the controller after Cloudinary upload,
+    // but we can allow the URL string here if needed.
+    avatar: z.string().optional(),
+});
+
+
+
+
 export const userValidation = {
     createUserZodSchema,
+    updateProfileZodSchema
 };

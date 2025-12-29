@@ -9,6 +9,7 @@ import { AppError } from "../../utils/AppError";
 import httpstatuscode from "http-status-codes";
 import { calculateAge } from "../../utils/calculateAge";
 import { createUserTokens } from "../../utils/userTokens";
+import { FileUploadService } from "../../config/multer.config";
 
 const createUser = async (req: Request) => {
     const data = req.body;
@@ -172,8 +173,9 @@ const changeProfileStatus = async (id: string, payload: { status: UserStatus }) 
 
     return updateUserStatus;
 };
-
-const updateMyProfie = async (user: JwtPayload, req: Request) => {
+const updateMyProfile = async (req: Request) => {
+    const user = req.user as JwtPayload;
+    // 1. Verify user exists and get their ID
     const userInfo = await prisma.user.findUniqueOrThrow({
         where: {
             email: user?.email,
@@ -181,23 +183,67 @@ const updateMyProfie = async (user: JwtPayload, req: Request) => {
         }
     });
 
+    // 2. Handle File Upload
     const file = req.file;
     if (file) {
-        // const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
-        // req.body.profilePhoto = uploadToCloudinary?.secure_url;
+        const uploadToCloudinary = await FileUploadService.uploadSingleFile(file.buffer, file.originalname);
+        // Map the cloudinary URL to the 'avatar' field in your Profile model
+        req.body.avatar = uploadToCloudinary?.data?.secure_url;
     }
 
-    let profileInfo;
+    // 3. Extract data from body
+    // We separate email/status if you want to prevent users from changing them via this route
+    const { firstName, lastName, phone, avatar, bio, gender, weight, isAvailable, division, city, address } = req.body;
 
+    // 4. Nested Update
+    const updatedUser = await prisma.user.update({
+        where: {
+            id: userInfo.id
+        },
+        data: {
+            profile: {
+                upsert: {
+                    // What to do if the profile ALREADY exists
+                    update: {
+                        firstName,
+                        lastName,
+                        phone,
+                        avatar,
+                        bio,
+                        gender,
+                        weight: weight ? parseFloat(weight) : undefined,
+                        isAvailable,
+                        division,
+                        city,
+                        address
+                    },
+                    // What to do if the profile DOES NOT exist
+                    create: {
+                        firstName: firstName ?? "", // Provide defaults for required fields
+                        lastName: lastName ?? "",
+                        phone: phone ?? "",
+                        bloodGroup: req.body.bloodGroup || "O_POSITIVE", // Required in schema
+                        dateOfBirth: req.body.dateOfBirth ? new Date(req.body.dateOfBirth) : new Date(),
+                        city: city ?? "",
+                        division: division ?? "",
+                        avatar,
+                        bio,
+                        gender,
+                        weight: weight ? parseFloat(weight) : undefined,
+                    }
+                }
+            }
+        },
+        include: { profile: true }
+    });
 
-
-    // return { ...profileInfo };
-}
+    return updatedUser;
+};
 
 export const UserService = {
     createUser,
     getAllFromDB,
     getMyProfile,
     changeProfileStatus,
-    updateMyProfie
+    updateMyProfile
 }
