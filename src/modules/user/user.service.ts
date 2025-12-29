@@ -155,46 +155,19 @@ const getMyProfile = async (user: JwtPayload) => {
     const userInfo = await prisma.user.findUniqueOrThrow({
         where: {
             email: user.email,
-            // status: UserStatus.ACTIVE
+            status: UserStatus.ACTIVE
         },
         select: {
             id: true,
             email: true,
-            // needPasswordChange: true,
+            needPassChange: true,
             role: true,
-            // status: true
+            status: true,
+            profile: true
         }
     })
 
-    let profileData;
-
-    // if (userInfo.role === UserRole.PATIENT) {
-    //     profileData = await prisma.patient.findUnique({
-    //         where: {
-    //             email: userInfo.email
-    //         }
-    //     })
-    // }
-    // else if (userInfo.role === UserRole.DOCTOR) {
-    //     profileData = await prisma.doctor.findUnique({
-    //         where: {
-    //             email: userInfo.email
-    //         }
-    //     })
-    // }
-    // else if (userInfo.role === UserRole.ADMIN) {
-    //     profileData = await prisma.admin.findUnique({
-    //         where: {
-    //             email: userInfo.email
-    //         }
-    //     })
-    // }
-
-    return {
-        ...userInfo,
-        // ...profileData
-    };
-
+    return userInfo
 };
 
 const changeProfileStatus = async (id: string, payload: { status: UserStatus }) => {
