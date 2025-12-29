@@ -6,11 +6,11 @@ const router = express.Router();
 const moduleRoutes = [
   {
     path: '/user',
-    // route: userRoutes,
+    route: userRoutes,
   },
   {
     path: '/auth',
-    // route: authRoutes,
+    route: authRoutes,
   },
 
 ];
