@@ -47,10 +47,11 @@ enum Gender {
   FEMALE
 }
 
-enum status {
+enum UserStatus {
   ACTIVE
   INACTIVE
   SUSPENDED
+  DELETED
 }
 
 model User {
@@ -59,7 +60,7 @@ model User {
   password        String
   role            UserRole  @default(DONOR)
   isVerified      Boolean   @default(false)
-  status          status    @default(ACTIVE)
+  status          UserStatus    @default(ACTIVE)
   profile         Profile?
   needPassChange  Boolean   @default(false)
   donations       Donation[]

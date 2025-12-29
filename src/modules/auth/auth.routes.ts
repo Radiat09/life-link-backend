@@ -10,6 +10,7 @@ router.get(
   "/me",
   checkAuth(
     UserRole.ADMIN,
+    UserRole.SUPER_ADMIN
   ),
   authController.getMe
 )
@@ -28,6 +29,7 @@ router.post(
   '/change-password',
   checkAuth(
     UserRole.ADMIN,
+    UserRole.SUPER_ADMIN
   ),
   authController.changePassword
 );

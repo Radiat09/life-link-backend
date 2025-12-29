@@ -7,13 +7,14 @@ import { createNewAccessTokenWithRefreshToken, createUserTokens } from "../../ut
 import emailSender from "./emailSender";
 import { AppError } from "../../utils/AppError";
 import { prisma } from "../../config/prisma";
-import { status } from "@prisma/client";
+import { UserStatus } from "@prisma/client";
+
 
 const login = async (payload: { email: string; password: string }) => {
   const user = await prisma.user.findUniqueOrThrow({
     where: {
       email: payload.email,
-      status: status.ACTIVE,
+      status: UserStatus.ACTIVE,
     },
   });
 
@@ -45,7 +46,7 @@ const changePassword = async (user: any, payload: any) => {
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
       email: user.email,
-      // status: UserStatus.ACTIVE
+      status: UserStatus.ACTIVE
     }
   });
 
@@ -63,7 +64,7 @@ const changePassword = async (user: any, payload: any) => {
     },
     data: {
       password: hashedPassword,
-      // needPasswordChange: false
+      needPassChange: false
     }
   })
 

@@ -1,4 +1,4 @@
-import { User, status } from '@prisma/client';
+import { User, UserStatus } from '@prisma/client';
 import httpStatus from 'http-status-codes';
 import { JwtPayload } from 'jsonwebtoken';
 import { envVars } from '../config/env';
@@ -33,7 +33,7 @@ export const createNewAccessTokenWithRefreshToken = async (refreshToken: string)
     where: {
       id: verifiedRefreshToken.userId,
       email: verifiedRefreshToken.email,
-      status: status.ACTIVE,
+      status: UserStatus.ACTIVE,
     },
   });
 
@@ -41,12 +41,16 @@ export const createNewAccessTokenWithRefreshToken = async (refreshToken: string)
     throw new AppError(httpStatus.BAD_REQUEST, 'User does not exist');
   }
 
-  if (isUserExist.status === status.INACTIVE) {
+  if (isUserExist.status === UserStatus.INACTIVE) {
     throw new AppError(httpStatus.BAD_REQUEST, `User is ${isUserExist.status}`);
   }
-  if (isUserExist.status === status.SUSPENDED) {
+  if (isUserExist.status === UserStatus.DELETED) {
     throw new AppError(httpStatus.BAD_REQUEST, 'User does not exits anymore');
   }
+  if (isUserExist.status === UserStatus.SUSPENDED) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'User is SUSPENDED. Please contact support.');
+  }
+
 
   const jwtPayload = {
     email: isUserExist.email,
