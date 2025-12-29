@@ -1,101 +1,87 @@
 import { Request } from "express";
 import bcrypt from "bcryptjs";
-import { Admin, Doctor, Prisma, UserRole, UserStatus } from "@prisma/client";
+import { Prisma, UserStatus } from "@prisma/client";
 import { userSearchableFields } from "./user.constant";
-import { FileUploadService } from "../../config/multer.config";
 import { prisma } from "../../config/prisma";
 import { IOptions, paginationHelper } from "../../helpers/paginationHelper";
 import { JwtPayload } from "jsonwebtoken";
+import { AppError } from "../../utils/AppError";
+import httpstatuscode from "http-status-codes";
+import { calculateAge } from "../../utils/calculateAge";
+import { createUserTokens } from "../../utils/userTokens";
 
+const createUser = async (req: Request) => {
+    const data = req.body;
 
-const createPatient = async (req: Request) => {
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+        where: { email: data.email },
+    });
 
-    // if (req.file) {
-    //     const uploadResult = await FileUploadService.uploadSingleFile(req.file,"test-folder");
+    if (existingUser) {
+        throw new AppError(httpstatuscode.CONFLICT, 'User with this email already exists');
+    }
 
-    // }
+    // Calculate age from date of birth
+    const age = calculateAge(new Date(data.dateOfBirth));
 
-    const hashPassword = await bcrypt.hash(req.body.password, 10);
+    // Validate age for donors
+    if (data.role === 'DONOR' && (age < 18 || age > 65)) {
+        throw new AppError(httpstatuscode.BAD_REQUEST, 'Donors must be between 18 and 65 years old');
+    }
 
-    const result = await prisma.$transaction(async (tnx) => {
-        await tnx.user.create({
+    // Hash password
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+
+    // Create user transaction
+    const result = await prisma.$transaction(async (tx) => {
+        // Create user
+        const user = await tx.user.create({
             data: {
-                email: req.body.patient.email,
-                password: hashPassword
-            }
+                email: data.email,
+                password: hashedPassword,
+                role: data.role,
+            },
         });
 
-        // return await tnx.patient.create({
-        //     data: req.body.patient
-        // })
-    })
+        // Create profile
+        const profile = await tx.profile.create({
+            data: {
+                userId: user.id,
+                firstName: data.firstName,
+                lastName: data.lastName,
+                phone: data.phone,
+                bloodGroup: data.bloodGroup,
+                dateOfBirth: new Date(data.dateOfBirth),
+                city: data.city,
+                division: data.division,
+                address: data.address,
+                country: data.country || 'Bangladesh', // Default for now
+            },
+        });
+
+        // Generate tokens
+        const tokens = createUserTokens(user);
+
+        return {
+            user: {
+                id: user.id,
+                email: user.email,
+                role: user.role,
+                isVerified: user.isVerified,
+                profile: {
+                    firstName: profile.firstName,
+                    lastName: profile.lastName,
+                    bloodGroup: profile.bloodGroup,
+                    city: profile.city,
+                },
+            },
+            tokens,
+        };
+    });
 
     return result;
 }
-
-const createAdmin = async (req: Request): Promise<Admin> => {
-
-    const file = req.file;
-
-    // if (file) {
-    //     const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
-    //     req.body.admin.profilePhoto = uploadToCloudinary?.secure_url
-    // }
-
-    const hashedPassword: string = await bcrypt.hash(req.body.password, 10)
-
-    const userData = {
-        email: req.body.admin.email,
-        password: hashedPassword,
-        role: UserRole.ADMIN
-    }
-
-    const result = await prisma.$transaction(async (transactionClient) => {
-        await transactionClient.user.create({
-            data: userData
-        });
-
-        // const createdAdminData = await transactionClient.admin.create({
-        //     data: req.body.admin
-        // });
-
-        // return createdAdminData;
-    });
-
-    return result;
-};
-
-const createDoctor = async (req: Request): Promise<Doctor> => {
-
-    const file = req.file;
-
-    if (file) {
-        // const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
-        // req.body.doctor.profilePhoto = uploadToCloudinary?.secure_url
-    }
-    const hashedPassword: string = await bcrypt.hash(req.body.password, 10)
-
-    const userData = {
-        email: req.body.doctor.email,
-        password: hashedPassword,
-        // role: UserRole.DOCTOR
-    }
-
-    const result = await prisma.$transaction(async (transactionClient) => {
-        await transactionClient.user.create({
-            data: userData
-        });
-
-        // const createdDoctorData = await transactionClient.doctor.create({
-        //     data: req.body.doctor
-        // });
-
-        // return createdDoctorData;
-    });
-
-    return result;
-};
-
 
 const getAllFromDB = async (params: any, options: IOptions) => {
     const { page, limit, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(options)
@@ -171,7 +157,7 @@ const getMyProfile = async (user: JwtPayload) => {
 };
 
 const changeProfileStatus = async (id: string, payload: { status: UserStatus }) => {
-    const userData = await prisma.user.findUniqueOrThrow({
+    await prisma.user.findUniqueOrThrow({
         where: {
             id
         }
@@ -191,7 +177,7 @@ const updateMyProfie = async (user: JwtPayload, req: Request) => {
     const userInfo = await prisma.user.findUniqueOrThrow({
         where: {
             email: user?.email,
-            // status: UserStatus.ACTIVE
+            status: UserStatus.ACTIVE
         }
     });
 
@@ -203,38 +189,13 @@ const updateMyProfie = async (user: JwtPayload, req: Request) => {
 
     let profileInfo;
 
-    // if (userInfo.role === UserRole.ADMIN) {
-    //     profileInfo = await prisma.admin.update({
-    //         where: {
-    //             email: userInfo.email
-    //         },
-    //         data: req.body
-    //     })
-    // }
-    // else if (userInfo.role === UserRole.DOCTOR) {
-    //     profileInfo = await prisma.doctor.update({
-    //         where: {
-    //             email: userInfo.email
-    //         },
-    //         data: req.body
-    //     })
-    // }
-    // else if (userInfo.role === UserRole.PATIENT) {
-    //     profileInfo = await prisma.patient.update({
-    //         where: {
-    //             email: userInfo.email
-    //         },
-    //         data: req.body
-    //     })
-    // }
+
 
     // return { ...profileInfo };
 }
 
 export const UserService = {
-    createPatient,
-    createAdmin,
-    createDoctor,
+    createUser,
     getAllFromDB,
     getMyProfile,
     changeProfileStatus,

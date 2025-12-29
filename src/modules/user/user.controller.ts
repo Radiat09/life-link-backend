@@ -6,39 +6,44 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import pick from "../../helpers/pick";
 import { JwtPayload } from "jsonwebtoken";
+import { setAuthCookie } from "../../utils/setCookie";
+import { envVars } from "../../config/env";
 
-const createPatient = catchAsync(async (req: Request, res: Response) => {
-    const result = await UserService.createPatient(req);
-
+const createUser = catchAsync(async (req: Request, res: Response) => {
+    const result = await UserService.createUser(req);
+    setAuthCookie(res, {
+        accessToken: result.tokens.accessToken,
+        refreshToken: result.tokens.refreshToken,
+    });
     sendResponse(res, {
         statusCode: 201,
         success: true,
-        message: "Patient created successfully!",
-        data: result
+        message: "User created successfully!",
+        data: envVars.NODE_ENV === "development" ? result.user : null
     })
 })
 
-const createAdmin = catchAsync(async (req: Request, res: Response) => {
+// const createAdmin = catchAsync(async (req: Request, res: Response) => {
 
-    const result = await UserService.createAdmin(req);
-    sendResponse(res, {
-        statusCode: 201,
-        success: true,
-        message: "Admin Created successfuly!",
-        data: result
-    })
-});
+//     const result = await UserService.createAdmin(req);
+//     sendResponse(res, {
+//         statusCode: 201,
+//         success: true,
+//         message: "Admin Created successfuly!",
+//         data: result
+//     })
+// });
 
-const createDoctor = catchAsync(async (req: Request, res: Response) => {
+// const createDoctor = catchAsync(async (req: Request, res: Response) => {
 
-    const result = await UserService.createDoctor(req);
-    sendResponse(res, {
-        statusCode: 201,
-        success: true,
-        message: "Doctor Created successfuly!",
-        data: result
-    })
-});
+//     const result = await UserService.createDoctor(req);
+//     sendResponse(res, {
+//         statusCode: 201,
+//         success: true,
+//         message: "Doctor Created successfuly!",
+//         data: result
+//     })
+// });
 
 const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
     const filters = pick(req.query, userFilterableFields) // searching , filtering
@@ -55,11 +60,9 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
     })
 })
 
-const getMyProfile = catchAsync(async (req: Request & { user?: JwtPayload }, res: Response) => {
+const getMyProfile = catchAsync(async (req: Request, res: Response) => {
 
-    const user = req.user;
-
-    const result = await UserService.getMyProfile(user);
+    const result = await UserService.getMyProfile(req.user);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
@@ -97,9 +100,7 @@ const updateMyProfie = catchAsync(async (req: Request & { user?: JwtPayload }, r
 });
 
 export const UserController = {
-    createPatient,
-    createAdmin,
-    createDoctor,
+    createUser,
     getAllFromDB,
     getMyProfile,
     changeProfileStatus,

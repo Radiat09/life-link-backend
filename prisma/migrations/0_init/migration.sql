@@ -1,3 +1,6 @@
+-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "public";
+
 -- CreateEnum
 CREATE TYPE "UserRole" AS ENUM ('DONOR', 'RECIPIENT', 'HOSPITAL', 'ADMIN', 'SUPER_ADMIN');
 
@@ -13,16 +16,20 @@ CREATE TYPE "UrgencyLevel" AS ENUM ('LOW', 'MEDIUM', 'HIGH', 'CRITICAL');
 -- CreateEnum
 CREATE TYPE "Gender" AS ENUM ('MALE', 'FEMALE');
 
+-- CreateEnum
+CREATE TYPE "UserStatus" AS ENUM ('ACTIVE', 'INACTIVE', 'SUSPENDED', 'DELETED');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "role" "UserRole" NOT NULL DEFAULT 'DONOR',
+    "role" "UserRole" NOT NULL DEFAULT 'RECIPIENT',
     "isVerified" BOOLEAN NOT NULL DEFAULT false,
-    "isActive" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "needPassChange" BOOLEAN NOT NULL DEFAULT false,
+    "status" "UserStatus" NOT NULL DEFAULT 'ACTIVE',
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -43,7 +50,7 @@ CREATE TABLE "Profile" (
     "lastDonation" TIMESTAMP(3),
     "address" TEXT,
     "city" TEXT NOT NULL,
-    "state" TEXT NOT NULL,
+    "division" TEXT NOT NULL,
     "country" TEXT NOT NULL DEFAULT 'Bangladesh',
     "latitude" DOUBLE PRECISION,
     "longitude" DOUBLE PRECISION,
@@ -208,3 +215,4 @@ ALTER TABLE "Review" ADD CONSTRAINT "Review_donationId_fkey" FOREIGN KEY ("donat
 
 -- AddForeignKey
 ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
