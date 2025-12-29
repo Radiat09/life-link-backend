@@ -1,0 +1,192 @@
+generator client {
+  provider = "prisma-client-js"
+
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  DONOR
+  RECIPIENT
+  HOSPITAL
+  ADMIN
+}
+
+enum BloodGroup {
+  A_POSITIVE
+  A_NEGATIVE
+  B_POSITIVE
+  B_NEGATIVE
+  AB_POSITIVE
+  AB_NEGATIVE
+  O_POSITIVE
+  O_NEGATIVE
+}
+
+enum RequestStatus {
+  PENDING
+  ACTIVE
+  PARTIALLY_FULFILLED
+  FULFILLED
+  EXPIRED
+  CANCELLED
+}
+
+enum UrgencyLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  password        String
+  role            UserRole  @default(DONOR)
+  isVerified      Boolean   @default(false)
+  isActive        Boolean   @default(true)
+  profile         Profile?
+  donations       Donation[]
+  bloodRequests   BloodRequest[]
+  notifications   Notification[]
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@index([email])
+  @@index([role])
+}
+
+model Profile {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName       String
+  lastName        String
+  phone           String
+  avatar          String?
+  bio             String?
+  gender          Gender?
+  
+  // Medical Information
+  bloodGroup      BloodGroup
+  dateOfBirth     DateTime
+  weight          Float?     // in kg
+  lastDonation    DateTime?
+  
+  // Location
+  address         String?
+  city            String
+  state           String
+  country         String    @default("Bangladesh")
+  latitude        Float?
+  longitude       Float?
+  
+  // Preferences
+  isAvailable     Boolean   @default(true)
+  notificationPrefs Json    @default("{}")
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@index([bloodGroup])
+  @@index([city])
+  @@index([isAvailable])
+}
+
+model BloodRequest {
+  id              String    @id @default(cuid())
+  requestId       String    @unique @default(uuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title           String
+  description     String?
+  bloodGroup      BloodGroup
+  unitsRequired   Int       @default(1)
+  urgencyLevel    UrgencyLevel @default(MEDIUM)
+  
+  hospitalName    String
+  hospitalAddress String
+  city            String
+  contactPerson   String
+  contactPhone    String
+  
+  status          RequestStatus @default(PENDING)
+  fulfilledUnits  Int           @default(0)
+  
+  requiredDate    DateTime
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  donations       Donation[]
+  
+  @@index([bloodGroup])
+  @@index([city])
+  @@index([urgencyLevel])
+  @@index([status])
+  @@index([requiredDate])
+}
+
+model Donation {
+  id              String    @id @default(cuid())
+  donorId         String
+  donor           User      @relation(fields: [donorId], references: [id], onDelete: Cascade)
+  requestId       String?
+  bloodRequest    BloodRequest? @relation(fields: [requestId], references: [id], onDelete: SetNull)
+  
+  donationDate    DateTime
+  status          String    @default("SCHEDULED") // SCHEDULED, COMPLETED, CANCELLED, NO_SHOW
+  unitsDonated    Float     @default(1.0)
+  
+  hemoglobinLevel Float?
+  bloodPressure   String?
+  notes           String?
+  
+  review          Review?
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@index([donorId])
+  @@index([requestId])
+  @@index([donationDate])
+  @@index([status])
+}
+
+model Review {
+  id              String    @id @default(cuid())
+  donationId      String    @unique
+  donation        Donation  @relation(fields: [donationId], references: [id], onDelete: Cascade)
+  rating          Int       // 1 to 5
+  comment         String?
+  reviewerId      String
+  createdAt       DateTime  @default(now())
+  
+  @@index([donationId])
+  @@index([rating])
+}
+
+model Notification {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type            String    // MATCH_FOUND, APPOINTMENT, SYSTEM
+  title           String
+  message         String
+  isRead          Boolean   @default(false)
+  link            String?
+  createdAt       DateTime  @default(now())
+  
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+}
