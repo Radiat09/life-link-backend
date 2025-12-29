@@ -58,7 +58,7 @@ model User {
   id              String    @id @default(cuid())
   email           String    @unique
   password        String
-  role            UserRole  @default(DONOR)
+  role            UserRole  @default(RECIPIENT)
   isVerified      Boolean   @default(false)
   status          UserStatus    @default(ACTIVE)
   profile         Profile?
