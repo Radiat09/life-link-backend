@@ -7,7 +7,8 @@ import { BloodRequestService } from './bloodRequest.service';
 // Create a new blood request
 const createRequest = catchAsync(async (req: Request, res: Response) => {
   const user = req.user;
-  const result = await BloodRequestService.createRequest(user.id, req.body);
+
+  const result = await BloodRequestService.createRequest(user, req.body);
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,

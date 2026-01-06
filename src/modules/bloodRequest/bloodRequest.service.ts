@@ -4,6 +4,7 @@ import { AppError } from "../../utils/AppError";
 import httpStatus from "http-status";
 import { calculateAge } from "../../utils/calculateAge";
 import { NotificationService } from "../notifications/notification.service";
+import { JwtPayload } from "jsonwebtoken";
 
 // Types based on your schema
 interface CreateRequestInput {
@@ -88,15 +89,16 @@ const formatRequestResponse = (request: any) => {
  * Create a new blood request
  */
 const createRequest = async (
-  userId: string,
+  user: JwtPayload,
   data: CreateRequestInput
 ): Promise<any> => {
+
   // Check if user exists
-  const user = await prisma.user.findUnique({
-    where: { id: userId }
+  const userExists = await prisma.user.findUnique({
+    where: { email: user.email }
   });
 
-  if (!user) {
+  if (!userExists) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
 
@@ -112,7 +114,7 @@ const createRequest = async (
   // Create the blood request
   const request = await prisma.bloodRequest.create({
     data: {
-      userId,
+      userId: userExists.id,
       title: data.title,
       description: data.description,
       bloodGroup: data.bloodGroup,
@@ -587,10 +589,21 @@ const findMatchingDonors = async (requestId: string): Promise<any[]> => {
         isAvailable: true,
         bloodGroup: request.bloodGroup,
         city: request.city,
-        lastDonation: {
-          lt: new Date(Date.now() - 56 * 24 * 60 * 60 * 1000) // 56 days ago
-        }
-      }
+        // lastDonation: {
+        //   lt: new Date(Date.now() - 56 * 24 * 60 * 60 * 1000) // 56 days ago
+        // }
+        OR: [
+          {
+            lastDonation: {
+              lt: new Date(Date.now() - 56 * 24 * 60 * 60 * 1000)
+            }
+          },
+          {
+            lastDonation: null // Include people who haven't donated yet
+          }
+        ]
+      },
+
     },
     include: {
       profile: true,
@@ -621,6 +634,7 @@ const findMatchingDonors = async (requestId: string): Promise<any[]> => {
       score += 20;
     }
 
+
     // Recent donor penalty
     if (donor.donations.length > 0) {
       const lastDonation = new Date(donor.donations[0].donationDate);
@@ -630,6 +644,10 @@ const findMatchingDonors = async (requestId: string): Promise<any[]> => {
       if (daysSinceLast < 90) {
         score -= 10;
       }
+    }
+
+    if (donor.donations.length === 0) {
+      score += 5; // Small encouragement bonus for first-timers
     }
 
     // Age factor
@@ -655,7 +673,7 @@ const findMatchingDonors = async (requestId: string): Promise<any[]> => {
 
     for (const donor of topDonors) {
       // This would require implementing NotificationService
-      // await NotificationService.createMatchNotification(donor.id, request);
+      await NotificationService.createMatchNotification(donor.id, request);
     }
   } catch (error) {
     console.error('Error creating notifications:', error);

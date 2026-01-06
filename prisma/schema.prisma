@@ -10,7 +10,7 @@ model User {
   id             String         @id @default(cuid())
   email          String         @unique
   password       String
-  role           UserRole       @default(RECIPIENT)
+  role           UserRole       @default(DONOR)
   isVerified     Boolean        @default(false)
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
