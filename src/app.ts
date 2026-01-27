@@ -1,5 +1,6 @@
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import helmet from 'helmet';
 import express, { Application, Request, Response } from 'express';
 import router from './routes';
 import { envVars } from './config/env';
@@ -22,9 +23,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // Then other middleware
 app.use(cookieParser());
+app.use(helmet());
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: envVars.FRONTEND_URL || 'http://localhost:3000',
     credentials: true,
   }),
 );
@@ -56,3 +58,4 @@ app.use(globalErrorHandler);
 app.use(notFound);
 
 export default app;
+

@@ -1,4 +1,4 @@
-import { Prisma, UserStatus, RequestStatus, UrgencyLevel, BloodGroup, UserRole } from "@prisma/client";
+import { UserStatus, RequestStatus, UrgencyLevel, BloodGroup, UserRole } from "@prisma/client";
 import { prisma } from "../../config/prisma";
 import { AppError } from "../../utils/AppError";
 import httpStatus from "http-status";
@@ -33,18 +33,6 @@ interface UpdateRequestInput {
   contactPhone?: string;
   requiredDate?: Date;
   status?: RequestStatus;
-}
-
-interface SearchRequestsInput {
-  page?: number;
-  limit?: number;
-  bloodGroup?: BloodGroup;
-  city?: string;
-  urgencyLevel?: UrgencyLevel;
-  status?: RequestStatus;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-  search?: string;
 }
 
 interface PaginatedRequests {

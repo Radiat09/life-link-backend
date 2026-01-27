@@ -13,9 +13,26 @@ type IOptionsResult = {
     sortOrder: string;
 }
 
+// Mobile-friendly defaults: smaller page size, max limit enforced
+const MOBILE_DEFAULT_LIMIT = 10;
+const MAX_LIMIT = 100;
+const MIN_LIMIT = 1;
+
 const calculatePagination = (options: IOptions): IOptionsResult => {
-    const page: number = Number(options.page) || 1;
-    const limit: number = Number(options.limit) || 10;
+    let page: number = Number(options.page) || 1;
+    let limit: number = Number(options.limit) || MOBILE_DEFAULT_LIMIT;
+
+    // Enforce limits for performance and mobile optimization
+    if (limit > MAX_LIMIT) {
+        limit = MAX_LIMIT;
+    }
+    if (limit < MIN_LIMIT) {
+        limit = MIN_LIMIT;
+    }
+    if (page < 1) {
+        page = 1;
+    }
+
     const skip: number = (Number(page) - 1) * limit;
 
     const sortBy: string = options.sortBy || "createdAt";
@@ -31,5 +48,7 @@ const calculatePagination = (options: IOptions): IOptionsResult => {
 }
 
 export const paginationHelper = {
-    calculatePagination
+    calculatePagination,
+    MOBILE_DEFAULT_LIMIT,
+    MAX_LIMIT
 }

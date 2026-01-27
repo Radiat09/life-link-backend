@@ -35,7 +35,7 @@ export const seedSuperAdmin = async () => {
             phone: "01700000000",
             bloodGroup: "O_POSITIVE",
             city: "Dhaka",
-            state: "Dhaka",
+            division: "Dhaka",
             dateOfBirth: new Date("1990-01-01"),
           },
         },

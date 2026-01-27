@@ -135,6 +135,22 @@ model Notification {
   @@index([createdAt])
 }
 
+model BloodInventory {
+  id            String   @id @default(cuid())
+  bloodGroup    BloodGroup
+  unitsAvailable Int
+  minThreshold  Int
+  isLow         Boolean  @default(false)
+  notes         String?
+  hospitalId    String   @default("SYSTEM")
+  lastUpdated   DateTime @default(now()) @updatedAt
+  createdAt     DateTime @default(now())
+
+  @@unique([bloodGroup, hospitalId])
+  @@index([bloodGroup])
+  @@index([isLow])
+}
+
 enum UserRole {
   DONOR
   RECIPIENT
@@ -181,3 +197,4 @@ enum UserStatus {
   SUSPENDED
   DELETED
 }
+
