@@ -137,10 +137,10 @@ const getDashboardStats = async (): Promise<any> => {
     prisma.user.count(),
 
     // Total donors
-    prisma.user.count({ where: { role: UserRole.DONOR } }),
+    prisma.user.count({ where: { role: UserRole.USER } }),
 
     // Total recipients
-    prisma.user.count({ where: { role: UserRole.RECIPIENT } }),
+    prisma.user.count({ where: { role: UserRole.USER } }),
 
     // Total hospitals
     prisma.user.count({ where: { role: UserRole.HOSPITAL } }),

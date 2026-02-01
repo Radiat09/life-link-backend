@@ -3,6 +3,7 @@ import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { BloodRequestService } from './bloodRequest.service';
+import { AppError } from '../../utils/AppError';
 
 // Create a new blood request
 const createRequest = catchAsync(async (req: Request, res: Response) => {

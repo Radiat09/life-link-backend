@@ -10,7 +10,7 @@ model User {
   id             String         @id @default(cuid())
   email          String         @unique
   password       String
-  role           UserRole       @default(DONOR)
+  role           UserRole       @default(USER)
   isVerified     Boolean        @default(false)
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
@@ -152,8 +152,7 @@ model BloodInventory {
 }
 
 enum UserRole {
-  DONOR
-  RECIPIENT
+  USER
   HOSPITAL
   ADMIN
   SUPER_ADMIN

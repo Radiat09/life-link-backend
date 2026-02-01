@@ -4,6 +4,7 @@ import { AppError } from "../../utils/AppError";
 import httpStatus from "http-status";
 import { calculateAge } from "../../utils/calculateAge";
 import { NotificationService } from "../notifications/notification.service";
+import { EmailService } from "../../utils/emailService";
 import { JwtPayload } from "jsonwebtoken";
 
 // Types based on your schema
@@ -138,6 +139,16 @@ const createRequest = async (
       }
     }
   });
+
+  // Send request created email
+  EmailService.sendRequestCreatedEmail(
+    userExists.email,
+    request.user.profile?.firstName || 'User',
+    {
+      ...request,
+      id: request.id
+    }
+  ).catch(err => console.error('Email send failed:', err));
 
   // Trigger matching algorithm (async)
   findMatchingDonors(request.id).catch(console.error);
@@ -571,7 +582,7 @@ const findMatchingDonors = async (requestId: string): Promise<any[]> => {
   // Get all eligible donors
   const eligibleDonors = await prisma.user.findMany({
     where: {
-      role: UserRole.DONOR,
+      role: UserRole.USER,
       status: UserStatus.ACTIVE,
       profile: {
         isAvailable: true,
@@ -660,8 +671,22 @@ const findMatchingDonors = async (requestId: string): Promise<any[]> => {
     const topDonors = sortedDonors.slice(0, 5);
 
     for (const donor of topDonors) {
-      // This would require implementing NotificationService
+      // Create in-app notification
       await NotificationService.createMatchNotification(donor.id, request);
+
+      // Send email notification
+      EmailService.sendDonationMatchEmail(
+        donor.email,
+        donor.profile?.firstName || 'Donor',
+        {
+          city: request.city,
+          bloodGroup: request.bloodGroup,
+          hospitalName: request.hospitalName,
+          requiredDate: request.requiredDate,
+          contactPhone: request.contactPhone,
+          id: request.id
+        }
+      ).catch(err => console.error('Match email failed:', err));
     }
   } catch (error) {
     console.error('Error creating notifications:', error);

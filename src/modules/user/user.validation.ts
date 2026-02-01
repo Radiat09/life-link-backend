@@ -9,7 +9,7 @@ export const createUserZodSchema = z.object({
         .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
         .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
         .regex(/[0-9]/, 'Password must contain at least one number'),
-    role: z.enum(['DONOR', 'RECIPIENT', 'HOSPITAL', 'ADMIN']).default('RECIPIENT'),
+    role: z.enum(['USER', 'HOSPITAL', 'ADMIN']).default('USER'),
     firstName: z.string().min(2, 'First name must be at least 2 characters'),
     lastName: z.string().min(2, 'Last name must be at least 2 characters'),
     phone: z.string().regex(/^[0-9]{10,15}$/, 'Invalid phone number'),

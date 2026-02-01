@@ -2,6 +2,7 @@ import { prisma } from "../../config/prisma";
 import { AppError } from "../../utils/AppError";
 import httpStatus from "http-status";
 import { JwtPayload } from "jsonwebtoken";
+import { EmailService } from "../../utils/emailService";
 
 interface IOptions {
   page?: string | number;
@@ -107,6 +108,13 @@ const createReview = async (
       }
     }
   });
+
+  // Send review notification email to the donor
+  EmailService.sendReviewNotificationEmail(
+    review.donation.donor.email,
+    review.donation.donor.profile?.firstName || 'Donor',
+    reviewer.email
+  ).catch(err => console.error('Review notification email failed:', err));
 
   return formatReviewResponse(review);
 };

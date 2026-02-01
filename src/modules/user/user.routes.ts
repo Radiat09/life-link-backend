@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from 'express'
+import express from 'express'
 import { UserController } from './user.controller';
 import { userValidation } from './user.validation';
 import { UserRole } from '@prisma/client';
@@ -19,7 +19,7 @@ router.get(
 
 router.get(
     '/me',
-    checkAuth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.DONOR, UserRole.HOSPITAL, UserRole.RECIPIENT),
+    checkAuth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.USER, UserRole.HOSPITAL),
     UserController.getMyProfile
 )
 
@@ -39,7 +39,7 @@ router.patch(
 router.patch(
     "/update-my-profile",
     multerWithErrorHandling.single('file'),
-    checkAuth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.DONOR, UserRole.HOSPITAL, UserRole.RECIPIENT),
+    checkAuth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.USER, UserRole.HOSPITAL),
     validateRequest(userValidation.updateProfileZodSchema),
     UserController.updateMyProfile
 

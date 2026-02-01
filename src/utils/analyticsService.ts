@@ -8,9 +8,9 @@ interface AnalyticsFilters {
 
 const getDonorDemographics = async (_filters: AnalyticsFilters = {}) => {
   const [total, donors, byCity] = await Promise.all([
-    prisma.user.count({ where: { role: 'DONOR' } }),
+    prisma.user.count({ where: { role: 'USER' } }),
     prisma.user.findMany({
-      where: { role: 'DONOR' },
+      where: { role: 'USER' },
       select: {
         profile: {
           select: {
@@ -192,7 +192,7 @@ const getDashboardMetrics = async () => {
     fulfillmentRate,
     topBloodGroups
   ] = await Promise.all([
-    prisma.user.count({ where: { role: 'DONOR' } }),
+    prisma.user.count({ where: { role: 'USER' } }),
     prisma.donation.count(),
     prisma.bloodRequest.count(),
     prisma.donation.aggregate({

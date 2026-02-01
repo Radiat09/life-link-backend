@@ -27,8 +27,8 @@ const createUser = async (req: Request) => {
     const age = calculateAge(new Date(data.dateOfBirth));
 
     // Validate age for donors
-    if (data.role === 'DONOR' && (age < 18 || age > 65)) {
-        throw new AppError(httpstatuscode.BAD_REQUEST, 'Donors must be between 18 and 65 years old');
+    if (data.role === 'USER' && (age < 18 || age > 65)) {
+        throw new AppError(httpstatuscode.BAD_REQUEST, 'Users must be between 18 and 65 years old');
     }
 
     // Hash password

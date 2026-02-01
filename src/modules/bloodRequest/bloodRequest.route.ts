@@ -14,7 +14,7 @@ router.get('/', requestController.getAllRequests);
 // Protected routes (require authentication)
 router.post(
   '/',
-  checkAuth('DONOR', 'RECIPIENT', 'HOSPITAL', 'ADMIN', 'SUPER_ADMIN'),
+  checkAuth('USER', 'HOSPITAL', 'ADMIN', 'SUPER_ADMIN'),
   validateRequest(createRequestBloodSchema),
   requestController.createRequest
 );

@@ -13,14 +13,14 @@ router.get('/statistics', DonationController.getDonationStats);
 // Protected routes
 router.post(
   '/',
-  checkAuth(UserRole.DONOR, UserRole.HOSPITAL, UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  checkAuth(UserRole.USER, UserRole.HOSPITAL, UserRole.ADMIN, UserRole.SUPER_ADMIN),
   validateRequest(createDonationZodSchema),
   DonationController.createDonation
 );
 
 router.get(
   '/my-donations',
-  checkAuth(UserRole.DONOR, UserRole.HOSPITAL, UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  checkAuth(UserRole.USER, UserRole.HOSPITAL, UserRole.ADMIN, UserRole.SUPER_ADMIN),
   DonationController.getMyDonations
 );
 
@@ -32,20 +32,20 @@ router.get(
 
 router.get(
   '/:id',
-  checkAuth(UserRole.DONOR, UserRole.HOSPITAL, UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  checkAuth(UserRole.USER, UserRole.HOSPITAL, UserRole.ADMIN, UserRole.SUPER_ADMIN),
   DonationController.getDonationById
 );
 
 router.patch(
   '/:id',
-  checkAuth(UserRole.DONOR, UserRole.HOSPITAL, UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  checkAuth(UserRole.USER, UserRole.HOSPITAL, UserRole.ADMIN, UserRole.SUPER_ADMIN),
   validateRequest(updateDonationZodSchema),
   DonationController.updateDonation
 );
 
 router.patch(
   '/:id/cancel',
-  checkAuth(UserRole.DONOR, UserRole.HOSPITAL, UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  checkAuth(UserRole.USER, UserRole.HOSPITAL, UserRole.ADMIN, UserRole.SUPER_ADMIN),
   DonationController.cancelDonation
 );
 

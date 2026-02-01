@@ -14,7 +14,7 @@ router.get('/donor/:donorId', ReviewController.getDonorReviews);
 // Protected routes
 router.post(
   '/',
-  checkAuth(UserRole.DONOR, UserRole.RECIPIENT, UserRole.HOSPITAL, UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  checkAuth(UserRole.USER, UserRole.HOSPITAL, UserRole.ADMIN, UserRole.SUPER_ADMIN),
   validateRequest(createReviewZodSchema),
   ReviewController.createReview
 );
@@ -32,14 +32,14 @@ router.get(
 
 router.patch(
   '/:id',
-  checkAuth(UserRole.DONOR, UserRole.RECIPIENT, UserRole.HOSPITAL, UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  checkAuth(UserRole.USER, UserRole.HOSPITAL, UserRole.ADMIN, UserRole.SUPER_ADMIN),
   validateRequest(updateReviewZodSchema),
   ReviewController.updateReview
 );
 
 router.delete(
   '/:id',
-  checkAuth(UserRole.DONOR, UserRole.RECIPIENT, UserRole.HOSPITAL, UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  checkAuth(UserRole.USER, UserRole.HOSPITAL, UserRole.ADMIN, UserRole.SUPER_ADMIN),
   ReviewController.deleteReview
 );
 

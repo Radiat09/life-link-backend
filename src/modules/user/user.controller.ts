@@ -5,7 +5,6 @@ import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import pick from "../../helpers/pick";
-import { JwtPayload } from "jsonwebtoken";
 import { setAuthCookie } from "../../utils/setCookie";
 import { envVars } from "../../config/env";
 

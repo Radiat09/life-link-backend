@@ -8,19 +8,19 @@ const router = express.Router();
 // All routes require authentication
 router.get(
   '/',
-  checkAuth(UserRole.DONOR, UserRole.HOSPITAL, UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  checkAuth(UserRole.USER, UserRole.HOSPITAL, UserRole.ADMIN, UserRole.SUPER_ADMIN),
   NotificationController.getNotifications
 );
 
 router.patch(
   '/:id/read',
-  checkAuth(UserRole.DONOR, UserRole.HOSPITAL, UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  checkAuth(UserRole.USER, UserRole.HOSPITAL, UserRole.ADMIN, UserRole.SUPER_ADMIN),
   NotificationController.markAsRead
 );
 
 router.delete(
   '/:id',
-  checkAuth(UserRole.DONOR, UserRole.HOSPITAL, UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  checkAuth(UserRole.USER, UserRole.HOSPITAL, UserRole.ADMIN, UserRole.SUPER_ADMIN),
   NotificationController.deleteNotification
 );
 

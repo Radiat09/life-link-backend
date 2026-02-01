@@ -5,6 +5,7 @@ import { calculateAge } from "../../utils/calculateAge";
 import { JwtPayload } from "jsonwebtoken";
 import { UserStatus, RequestStatus } from "@prisma/client";
 import { BloodRequestService } from "../bloodRequest/bloodRequest.service";
+import { EmailService } from "../../utils/emailService";
 
 interface IOptions {
   page?: string | number;
@@ -158,6 +159,13 @@ const createDonation = async (
       where: { userId: userExists.id },
       data: { lastDonation: new Date(data.donationDate) }
     });
+
+    // Send donation confirmation email
+    EmailService.sendDonationConfirmationEmail(
+      userExists.email,
+      userExists.profile?.firstName || 'Donor',
+      donation
+    ).catch(err => console.error('Donation confirmation email failed:', err));
   }
 
   return formatDonationResponse(donation);
