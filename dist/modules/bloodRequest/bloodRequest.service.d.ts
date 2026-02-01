@@ -12,6 +12,7 @@ interface CreateRequestInput {
     contactPerson: string;
     contactPhone: string;
     requiredDate: Date;
+    isEmergency?: boolean;
 }
 interface UpdateRequestInput {
     title?: string;

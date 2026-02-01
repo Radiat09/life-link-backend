@@ -43,4 +43,37 @@ router.post(
   '/reset-password',
   authController.resetPassword
 )
+
+router.post(
+  '/send-email-verification',
+  checkAuth(
+    UserRole.USER,
+    UserRole.HOSPITAL
+  ),
+  authController.sendEmailVerification
+);
+
+router.post(
+  '/verify-email',
+  authController.verifyEmail
+);
+
+router.post(
+  '/send-phone-verification',
+  checkAuth(
+    UserRole.USER,
+    UserRole.HOSPITAL
+  ),
+  authController.sendPhoneVerification
+);
+
+router.post(
+  '/verify-phone',
+  checkAuth(
+    UserRole.USER,
+    UserRole.HOSPITAL
+  ),
+  authController.verifyPhone
+);
+
 export const authRoutes = router;

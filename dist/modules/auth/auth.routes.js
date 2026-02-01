@@ -15,5 +15,9 @@ router.post('/refresh-token', auth_controller_1.authController.refreshToken);
 router.post('/change-password', (0, checkAuth_1.checkAuth)(client_1.UserRole.ADMIN, client_1.UserRole.SUPER_ADMIN), auth_controller_1.authController.changePassword);
 router.post('/forgot-password', auth_controller_1.authController.forgotPassword);
 router.post('/reset-password', auth_controller_1.authController.resetPassword);
+router.post('/send-email-verification', (0, checkAuth_1.checkAuth)(client_1.UserRole.USER, client_1.UserRole.HOSPITAL), auth_controller_1.authController.sendEmailVerification);
+router.post('/verify-email', auth_controller_1.authController.verifyEmail);
+router.post('/send-phone-verification', (0, checkAuth_1.checkAuth)(client_1.UserRole.USER, client_1.UserRole.HOSPITAL), auth_controller_1.authController.sendPhoneVerification);
+router.post('/verify-phone', (0, checkAuth_1.checkAuth)(client_1.UserRole.USER, client_1.UserRole.HOSPITAL), auth_controller_1.authController.verifyPhone);
 exports.authRoutes = router;
 //# sourceMappingURL=auth.routes.js.map

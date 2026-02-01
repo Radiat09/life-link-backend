@@ -6,8 +6,8 @@ export declare const NotificationService: {
             createdAt: Date;
             link: string | null;
             userId: string;
-            message: string;
             type: string;
+            message: string;
             title: string;
             isRead: boolean;
         }[];
@@ -25,8 +25,8 @@ export declare const NotificationService: {
         createdAt: Date;
         link: string | null;
         userId: string;
-        message: string;
         type: string;
+        message: string;
         title: string;
         isRead: boolean;
     }>;
@@ -35,8 +35,8 @@ export declare const NotificationService: {
         createdAt: Date;
         link: string | null;
         userId: string;
-        message: string;
         type: string;
+        message: string;
         title: string;
         isRead: boolean;
     }>;

@@ -28,5 +28,20 @@ export declare const AuthService: {
         role: import(".prisma/client").$Enums.UserRole;
         needPassChange: boolean;
     }>;
+    sendEmailVerification: (userId: string) => Promise<{
+        message: string;
+    }>;
+    verifyEmail: (token: string) => Promise<{
+        message: string;
+    }>;
+    sendPhoneVerification: (userId: string) => Promise<{
+        message: string;
+    }>;
+    verifyPhone: (userId: string, code: string) => Promise<{
+        message: string;
+    }>;
+    checkEmergencyRestrictions: (userId: string, isEmergency?: boolean) => Promise<{
+        allowed: boolean;
+    }>;
 };
 //# sourceMappingURL=auth.service.d.ts.map

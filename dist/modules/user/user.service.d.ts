@@ -33,6 +33,12 @@ export declare const UserService: {
             password: string;
             role: import(".prisma/client").$Enums.UserRole;
             isVerified: boolean;
+            emailVerified: boolean;
+            phoneVerified: boolean;
+            verificationToken: string | null;
+            verificationExpires: Date | null;
+            lastRequestDate: Date | null;
+            requestCount: number;
             createdAt: Date;
             updatedAt: Date;
             needPassChange: boolean;
@@ -68,6 +74,9 @@ export declare const UserService: {
             longitude: number | null;
             isAvailable: boolean;
             notificationPrefs: Prisma.JsonValue;
+            medicalCert: string | null;
+            idDocument: string | null;
+            emergencyVerified: boolean;
         } | null;
     }>;
     changeProfileStatus: (id: string, payload: {
@@ -78,6 +87,12 @@ export declare const UserService: {
         password: string;
         role: import(".prisma/client").$Enums.UserRole;
         isVerified: boolean;
+        emailVerified: boolean;
+        phoneVerified: boolean;
+        verificationToken: string | null;
+        verificationExpires: Date | null;
+        lastRequestDate: Date | null;
+        requestCount: number;
         createdAt: Date;
         updatedAt: Date;
         needPassChange: boolean;
@@ -107,6 +122,9 @@ export declare const UserService: {
             longitude: number | null;
             isAvailable: boolean;
             notificationPrefs: Prisma.JsonValue;
+            medicalCert: string | null;
+            idDocument: string | null;
+            emergencyVerified: boolean;
         } | null;
     } & {
         id: string;
@@ -114,6 +132,12 @@ export declare const UserService: {
         password: string;
         role: import(".prisma/client").$Enums.UserRole;
         isVerified: boolean;
+        emailVerified: boolean;
+        phoneVerified: boolean;
+        verificationToken: string | null;
+        verificationExpires: Date | null;
+        lastRequestDate: Date | null;
+        requestCount: number;
         createdAt: Date;
         updatedAt: Date;
         needPassChange: boolean;

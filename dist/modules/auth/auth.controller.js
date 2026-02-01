@@ -88,12 +88,55 @@ const getMe = (0, catchAsync_1.default)(async (req, res) => {
         data: result,
     });
 });
+const sendEmailVerification = (0, catchAsync_1.default)(async (req, res) => {
+    const user = req.user;
+    const result = await auth_service_1.AuthService.sendEmailVerification(user.id);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: result.message,
+        data: null,
+    });
+});
+const verifyEmail = (0, catchAsync_1.default)(async (req, res) => {
+    const result = await auth_service_1.AuthService.verifyEmail(req.body.token);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: result.message,
+        data: null,
+    });
+});
+const sendPhoneVerification = (0, catchAsync_1.default)(async (req, res) => {
+    const user = req.user;
+    const result = await auth_service_1.AuthService.sendPhoneVerification(user.id);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: result.message,
+        data: null,
+    });
+});
+const verifyPhone = (0, catchAsync_1.default)(async (req, res) => {
+    const user = req.user;
+    const result = await auth_service_1.AuthService.verifyPhone(user.id, req.body.code);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: result.message,
+        data: null,
+    });
+});
 exports.authController = {
     login,
     refreshToken,
     changePassword,
     resetPassword,
     forgotPassword,
-    getMe
+    getMe,
+    sendEmailVerification,
+    verifyEmail,
+    sendPhoneVerification,
+    verifyPhone
 };
 //# sourceMappingURL=auth.controller.js.map

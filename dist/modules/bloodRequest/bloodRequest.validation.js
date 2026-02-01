@@ -39,7 +39,8 @@ exports.createRequestBloodSchema = zod_1.z.object({
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         return requiredDate >= today;
-    }, 'Required date must be today or in the future')
+    }, 'Required date must be today or in the future'),
+    isEmergency: zod_1.z.boolean().optional()
 });
 exports.updateRequestBloodSchema = zod_1.z.object({
     title: zod_1.z.string()

@@ -19,8 +19,28 @@ export declare const resetPasswordSchema: z.ZodObject<{
     token: z.ZodString;
     password: z.ZodString;
 }, z.core.$strip>;
+export declare const sendVerificationSchema: z.ZodObject<{
+    body: z.ZodObject<{
+        email: z.ZodOptional<z.ZodEmail>;
+        phone: z.ZodOptional<z.ZodString>;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+export declare const verifyEmailSchema: z.ZodObject<{
+    body: z.ZodObject<{
+        token: z.ZodString;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+export declare const verifyPhoneSchema: z.ZodObject<{
+    body: z.ZodObject<{
+        phone: z.ZodString;
+        code: z.ZodString;
+    }, z.core.$strip>;
+}, z.core.$strip>;
 export type LoginInput = z.infer<typeof loginSchema>['body'];
 export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>['body'];
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>['body'];
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+export type SendVerificationInput = z.infer<typeof sendVerificationSchema>['body'];
+export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>['body'];
+export type VerifyPhoneInput = z.infer<typeof verifyPhoneSchema>['body'];
 //# sourceMappingURL=auth.validation.d.ts.map

@@ -22,6 +22,7 @@ export declare const createRequestBloodSchema: z.ZodObject<{
     contactPerson: z.ZodString;
     contactPhone: z.ZodString;
     requiredDate: z.ZodString;
+    isEmergency: z.ZodOptional<z.ZodBoolean>;
 }, z.core.$strip>;
 export declare const updateRequestBloodSchema: z.ZodObject<{
     title: z.ZodOptional<z.ZodString>;

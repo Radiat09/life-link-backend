@@ -110,11 +110,62 @@ const getMe = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const sendEmailVerification = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user;
+  const result = await AuthService.sendEmailVerification(user.id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: result.message,
+    data: null,
+  });
+});
+
+const verifyEmail = catchAsync(async (req: Request, res: Response) => {
+  const result = await AuthService.verifyEmail(req.body.token);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: result.message,
+    data: null,
+  });
+});
+
+const sendPhoneVerification = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user;
+  const result = await AuthService.sendPhoneVerification(user.id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: result.message,
+    data: null,
+  });
+});
+
+const verifyPhone = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user;
+  const result = await AuthService.verifyPhone(user.id, req.body.code);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: result.message,
+    data: null,
+  });
+});
+
 export const authController = {
   login,
   refreshToken,
   changePassword,
   resetPassword,
   forgotPassword,
-  getMe
+  getMe,
+  sendEmailVerification,
+  verifyEmail,
+  sendPhoneVerification,
+  verifyPhone
 };

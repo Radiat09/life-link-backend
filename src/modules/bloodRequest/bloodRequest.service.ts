@@ -5,6 +5,7 @@ import httpStatus from "http-status";
 import { calculateAge } from "../../utils/calculateAge";
 import { NotificationService } from "../notifications/notification.service";
 import { EmailService } from "../../utils/emailService";
+import { AuthService } from "../auth/auth.service";
 import { JwtPayload } from "jsonwebtoken";
 
 // Types based on your schema
@@ -20,6 +21,7 @@ interface CreateRequestInput {
   contactPerson: string;
   contactPhone: string;
   requiredDate: Date;
+  isEmergency?: boolean;
 }
 
 interface UpdateRequestInput {
@@ -91,6 +93,10 @@ const createRequest = async (
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
 
+  // Check emergency restrictions
+  const isEmergency = data.isEmergency || data.urgencyLevel === UrgencyLevel.CRITICAL;
+  await AuthService.checkEmergencyRestrictions(userExists.id, isEmergency);
+
   // Validate required date
   const requiredDate = new Date(data.requiredDate);
   const today = new Date();
@@ -115,7 +121,9 @@ const createRequest = async (
       contactPerson: data.contactPerson,
       contactPhone: data.contactPhone,
       requiredDate: requiredDate,
-      status: RequestStatus.PENDING
+      status: RequestStatus.PENDING,
+      isEmergency: isEmergency,
+      verificationRequired: isEmergency
     },
     include: {
       user: {

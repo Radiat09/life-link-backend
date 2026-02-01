@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resetPasswordSchema = exports.forgotPasswordSchema = exports.refreshTokenSchema = exports.loginSchema = void 0;
+exports.verifyPhoneSchema = exports.verifyEmailSchema = exports.sendVerificationSchema = exports.resetPasswordSchema = exports.forgotPasswordSchema = exports.refreshTokenSchema = exports.loginSchema = void 0;
 const zod_1 = __importDefault(require("zod"));
 exports.loginSchema = zod_1.default.object({
     body: zod_1.default.object({
@@ -28,5 +28,22 @@ exports.resetPasswordSchema = zod_1.default.object({
         .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
         .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
         .regex(/[0-9]/, 'Password must contain at least one number'),
+});
+exports.sendVerificationSchema = zod_1.default.object({
+    body: zod_1.default.object({
+        email: zod_1.default.email('Invalid email address').optional(),
+        phone: zod_1.default.string().regex(/^[0-9]{10,15}$/, 'Invalid phone number').optional(),
+    })
+});
+exports.verifyEmailSchema = zod_1.default.object({
+    body: zod_1.default.object({
+        token: zod_1.default.string().min(1, 'Verification token is required'),
+    })
+});
+exports.verifyPhoneSchema = zod_1.default.object({
+    body: zod_1.default.object({
+        phone: zod_1.default.string().regex(/^[0-9]{10,15}$/, 'Invalid phone number'),
+        code: zod_1.default.string().length(6, 'Verification code must be 6 digits'),
+    })
 });
 //# sourceMappingURL=auth.validation.js.map

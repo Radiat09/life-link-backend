@@ -11,6 +11,7 @@ const http_status_1 = __importDefault(require("http-status"));
 const calculateAge_1 = require("../../utils/calculateAge");
 const notification_service_1 = require("../notifications/notification.service");
 const emailService_1 = require("../../utils/emailService");
+const auth_service_1 = require("../auth/auth.service");
 // Helper function to format request response
 const formatRequestResponse = (request) => {
     return {
@@ -47,6 +48,9 @@ const createRequest = async (user, data) => {
     if (!userExists) {
         throw new AppError_1.AppError(http_status_1.default.NOT_FOUND, 'User not found');
     }
+    // Check emergency restrictions
+    const isEmergency = data.isEmergency || data.urgencyLevel === client_1.UrgencyLevel.CRITICAL;
+    await auth_service_1.AuthService.checkEmergencyRestrictions(userExists.id, isEmergency);
     // Validate required date
     const requiredDate = new Date(data.requiredDate);
     const today = new Date();
@@ -69,7 +73,9 @@ const createRequest = async (user, data) => {
             contactPerson: data.contactPerson,
             contactPhone: data.contactPhone,
             requiredDate: requiredDate,
-            status: client_1.RequestStatus.PENDING
+            status: client_1.RequestStatus.PENDING,
+            isEmergency: isEmergency,
+            verificationRequired: isEmergency
         },
         include: {
             user: {

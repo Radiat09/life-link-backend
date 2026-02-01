@@ -6,5 +6,9 @@ export declare const authController: {
     resetPassword: (req: Request, res: Response, next: import("express").NextFunction) => Promise<void>;
     forgotPassword: (req: Request, res: Response, next: import("express").NextFunction) => Promise<void>;
     getMe: (req: Request, res: Response, next: import("express").NextFunction) => Promise<void>;
+    sendEmailVerification: (req: Request, res: Response, next: import("express").NextFunction) => Promise<void>;
+    verifyEmail: (req: Request, res: Response, next: import("express").NextFunction) => Promise<void>;
+    sendPhoneVerification: (req: Request, res: Response, next: import("express").NextFunction) => Promise<void>;
+    verifyPhone: (req: Request, res: Response, next: import("express").NextFunction) => Promise<void>;
 };
 //# sourceMappingURL=auth.controller.d.ts.map
