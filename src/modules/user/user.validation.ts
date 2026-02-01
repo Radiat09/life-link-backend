@@ -33,9 +33,6 @@ export const createUserZodSchema = z.object({
     address: z.string().optional(),
 })
 
-
-
-
 export const updateProfileZodSchema = z.object({
     firstName: z.string().min(2, "First name is too short").optional(),
     lastName: z.string().min(2, "Last name is too short").optional(),
@@ -56,10 +53,26 @@ export const updateProfileZodSchema = z.object({
     avatar: z.string().optional(),
 });
 
-
-
+// Document upload validation
+export const documentUploadSchema = z.object({
+    medicalCertificate: z.instanceof(File)
+        .refine((file) => file.size <= 5 * 1024 * 1024, 'File size must be less than 5MB')
+        .refine(
+            (file) => ['application/pdf', 'image/jpeg', 'image/png'].includes(file.type),
+            'File must be PDF, JPEG, or PNG'
+        )
+        .optional(),
+    idDocument: z.instanceof(File)
+        .refine((file) => file.size <= 5 * 1024 * 1024, 'File size must be less than 5MB')
+        .refine(
+            (file) => ['application/pdf', 'image/jpeg', 'image/png'].includes(file.type),
+            'File must be PDF, JPEG, or PNG'
+        )
+        .optional(),
+});
 
 export const userValidation = {
     createUserZodSchema,
-    updateProfileZodSchema
+    updateProfileZodSchema,
+    documentUploadSchema
 };

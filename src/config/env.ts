@@ -29,6 +29,16 @@ interface EnvConfig {
     SMTP_HOST: string;
     SMTP_FROM: string;
   };
+  SMS_PROVIDER: string;
+  TWILIO_ACCOUNT_SID: string;
+  TWILIO_AUTH_TOKEN: string;
+  TWILIO_PHONE_NUMBER: string;
+  AWS_REGION: string;
+  AWS_ACCESS_KEY_ID: string;
+  AWS_SECRET_ACCESS_KEY: string;
+  DOCUMENT_UPLOAD_PATH: string;
+  MAX_FILE_SIZE: string;
+  ALLOWED_FILE_TYPES: string;
 }
 
 const loadEnvVariables = (): EnvConfig => {
@@ -54,12 +64,19 @@ const loadEnvVariables = (): EnvConfig => {
     "SMTP_HOST",
     "SMTP_USER",
     "SMTP_FROM",
-
+    "SMS_PROVIDER",
+    "DOCUMENT_UPLOAD_PATH",
+    "MAX_FILE_SIZE",
+    "ALLOWED_FILE_TYPES",
   ];
 
   requiredEnvVariables.forEach((key) => {
     if (!process.env[key]) {
-      throw new Error(`Missing required environment variable ${key}`);
+      // SMS and AWS variables are optional (can use defaults)
+      const optionalVars = ["TWILIO_ACCOUNT_SID", "TWILIO_AUTH_TOKEN", "TWILIO_PHONE_NUMBER", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"];
+      if (!optionalVars.includes(key)) {
+        throw new Error(`Missing required environment variable ${key}`);
+      }
     }
   });
 
@@ -89,6 +106,16 @@ const loadEnvVariables = (): EnvConfig => {
       SMTP_HOST: process.env.SMTP_HOST as string,
       SMTP_FROM: process.env.SMTP_FROM as string,
     },
+    SMS_PROVIDER: process.env.SMS_PROVIDER || "console",
+    TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID || "",
+    TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN || "",
+    TWILIO_PHONE_NUMBER: process.env.TWILIO_PHONE_NUMBER || "",
+    AWS_REGION: process.env.AWS_REGION || "us-east-1",
+    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID || "",
+    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || "",
+    DOCUMENT_UPLOAD_PATH: process.env.DOCUMENT_UPLOAD_PATH || "./uploads/documents",
+    MAX_FILE_SIZE: process.env.MAX_FILE_SIZE || "5242880",
+    ALLOWED_FILE_TYPES: process.env.ALLOWED_FILE_TYPES || "application/pdf,image/jpeg,image/png,image/jpg",
   };
 };
 

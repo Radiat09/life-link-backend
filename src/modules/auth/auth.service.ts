@@ -8,6 +8,7 @@ import emailSender from "./emailSender";
 import { AppError } from "../../utils/AppError";
 import { prisma } from "../../config/prisma";
 import { UserStatus } from "@prisma/client";
+import { smsService } from "../../utils/smsService";
 
 
 const login = async (payload: { email: string; password: string }) => {
@@ -610,8 +611,13 @@ const sendPhoneVerification = async (userId: string) => {
     }
   });
 
-  // In production, send SMS here
-  console.log(`SMS Verification Code for ${user.profile.phone}: ${verificationCode}`);
+  // Send SMS using configured provider
+  try {
+    await smsService.sendOTP(user.profile.phone, verificationCode);
+  } catch (error) {
+    console.error('Failed to send SMS:', error);
+    throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to send verification code');
+  }
 
   return { message: 'Verification code sent to your phone' };
 };

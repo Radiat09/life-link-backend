@@ -1,6 +1,7 @@
 import express from 'express';
 import { authRoutes } from '../modules/auth/auth.routes';
 import { userRoutes } from '../modules/user/user.routes';
+import { documentRoutes } from '../modules/user/document.routes';
 import { bloodRequestRoutes } from '../modules/bloodRequest/bloodRequest.route';
 import { donationRoutes } from '../modules/donations/donation.routes';
 import { reviewRoutes } from '../modules/reviews/review.routes';
@@ -18,6 +19,10 @@ const moduleRoutes = [
   {
     path: '/user',
     route: userRoutes,
+  },
+  {
+    path: '/documents',
+    route: documentRoutes,
   },
   {
     path: '/blood-requests',
