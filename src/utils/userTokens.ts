@@ -10,6 +10,7 @@ export const createUserTokens = (user: Partial<User>) => {
   const jwtPayload = {
     email: user.email,
     role: user.role,
+    userId: user.id,
   };
 
   const accessToken = generateToken(
@@ -55,6 +56,7 @@ export const createNewAccessTokenWithRefreshToken = async (refreshToken: string)
   const jwtPayload = {
     email: isUserExist.email,
     role: isUserExist.role,
+    userId: isUserExist.id,
   };
   const accessToken = generateToken(
     jwtPayload,

@@ -1,4 +1,5 @@
 import { envVars } from "../config/env";
+import twilio from "twilio";
 
 // SMS Service - Currently console-based, ready for Twilio/AWS SNS integration
 interface SMSProvider {
@@ -20,7 +21,7 @@ class TwilioSMSProvider implements SMSProvider {
     // Initialize Twilio client if credentials are available
     if (this.accountSid && this.authToken) {
       try {
-        const twilio = require('twilio');
+
         this.client = twilio(this.accountSid, this.authToken);
       } catch (error) {
         console.warn('Twilio not installed or configured. SMS will be logged to console.');
@@ -39,6 +40,8 @@ class TwilioSMSProvider implements SMSProvider {
   }
 
   private async sendSMS(phoneNumber: string, message: string): Promise<void> {
+
+    console.log("Log from send sms class", phoneNumber);
     if (this.client) {
       try {
         await this.client.messages.create({

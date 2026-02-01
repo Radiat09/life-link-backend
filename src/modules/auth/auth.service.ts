@@ -587,6 +587,8 @@ const verifyEmail = async (token: string) => {
 
 // Phone verification (simplified - in production, use SMS service)
 const sendPhoneVerification = async (userId: string) => {
+
+  console.log("log from send phone verification code", userId);
   const user = await prisma.user.findUniqueOrThrow({
     where: { id: userId, status: UserStatus.ACTIVE },
     include: { profile: true }
@@ -594,6 +596,10 @@ const sendPhoneVerification = async (userId: string) => {
 
   if (!user.profile) {
     throw new AppError(httpStatus.BAD_REQUEST, 'User profile not found');
+  }
+
+  if (!user.profile.phone) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'User phone number not found! Please update your phone number in profile.');
   }
 
   if (user.phoneVerified) {

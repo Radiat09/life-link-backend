@@ -135,7 +135,7 @@ const verifyEmail = catchAsync(async (req: Request, res: Response) => {
 
 const sendPhoneVerification = catchAsync(async (req: Request, res: Response) => {
   const user = req.user;
-  const result = await AuthService.sendPhoneVerification(user.id);
+  const result = await AuthService.sendPhoneVerification(user.userId);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -157,6 +157,8 @@ const verifyPhone = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+
 export const authController = {
   login,
   refreshToken,
@@ -167,5 +169,6 @@ export const authController = {
   sendEmailVerification,
   verifyEmail,
   sendPhoneVerification,
-  verifyPhone
+  verifyPhone,
+
 };
