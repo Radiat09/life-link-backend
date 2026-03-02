@@ -12,6 +12,7 @@ enum UserRole {
   RECIPIENT
   HOSPITAL
   ADMIN
+  SUPER_ADMIN
 }
 
 enum BloodGroup {
@@ -46,18 +47,25 @@ enum Gender {
   FEMALE
 }
 
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  DELETED
+}
+
 model User {
   id              String    @id @default(cuid())
   email           String    @unique
   password        String
   role            UserRole  @default(DONOR)
   isVerified      Boolean   @default(false)
-  isActive        Boolean   @default(true)
+  status          UserStatus    @default(ACTIVE)
   profile         Profile?
+  needPassChange  Boolean   @default(false)
   donations       Donation[]
   bloodRequests   BloodRequest[]
   notifications   Notification[]
-
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   
@@ -107,26 +115,21 @@ model BloodRequest {
   requestId       String    @unique @default(uuid())
   userId          String
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
   title           String
   description     String?
   bloodGroup      BloodGroup
   unitsRequired   Int       @default(1)
   urgencyLevel    UrgencyLevel @default(MEDIUM)
-  
   hospitalName    String
   hospitalAddress String
   city            String
   contactPerson   String
   contactPhone    String
-  
   status          RequestStatus @default(PENDING)
   fulfilledUnits  Int           @default(0)
-  
   requiredDate    DateTime
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
-  
   donations       Donation[]
   
   @@index([bloodGroup])
@@ -142,17 +145,13 @@ model Donation {
   donor           User      @relation(fields: [donorId], references: [id], onDelete: Cascade)
   requestId       String?
   bloodRequest    BloodRequest? @relation(fields: [requestId], references: [id], onDelete: SetNull)
-  
   donationDate    DateTime
   status          String    @default("SCHEDULED") // SCHEDULED, COMPLETED, CANCELLED, NO_SHOW
   unitsDonated    Float     @default(1.0)
-  
   hemoglobinLevel Float?
   bloodPressure   String?
   notes           String?
-  
   review          Review?
-  
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   

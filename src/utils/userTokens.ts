@@ -3,7 +3,6 @@ import httpStatus from 'http-status-codes';
 import { JwtPayload } from 'jsonwebtoken';
 import { envVars } from '../config/env';
 import { prisma } from '../config/prisma';
-
 import { generateToken, verifyToken } from './jwt';
 import { AppError } from './AppError';
 
@@ -33,7 +32,7 @@ export const createNewAccessTokenWithRefreshToken = async (refreshToken: string)
   const isUserExist = await prisma.user.findUnique({
     where: {
       id: verifiedRefreshToken.userId,
-      // email: verifiedRefreshToken.email,
+      email: verifiedRefreshToken.email,
       status: UserStatus.ACTIVE,
     },
   });
@@ -48,6 +47,10 @@ export const createNewAccessTokenWithRefreshToken = async (refreshToken: string)
   if (isUserExist.status === UserStatus.DELETED) {
     throw new AppError(httpStatus.BAD_REQUEST, 'User does not exits anymore');
   }
+  if (isUserExist.status === UserStatus.SUSPENDED) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'User is SUSPENDED. Please contact support.');
+  }
+
 
   const jwtPayload = {
     email: isUserExist.email,
@@ -61,6 +64,6 @@ export const createNewAccessTokenWithRefreshToken = async (refreshToken: string)
 
   return {
     accessToken,
-    needPasswordChange: isUserExist.needPasswordChange
+    needPasswordChange: isUserExist.needPassChange
   };
 };
